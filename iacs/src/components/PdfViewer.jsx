@@ -8,8 +8,8 @@ const MyPdfViewer = ({ myFile }) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [text, setText] = useState('');
-  const [speakingWordIndex, setSpeakingWordIndex] = useState(null);
-  const [pausedAtWordIndex, setPausedAtWordIndex] = useState(null);
+  const [speakingSentenceIndex, setSpeakingSentenceIndex] = useState(null);
+  const [pausedAtSentenceIndex, setPausedAtSentenceIndex] = useState(null);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -20,34 +20,44 @@ const MyPdfViewer = ({ myFile }) => {
 
       const page = await pdf.getPage(pageNumber);
       const content = await page.getTextContent();
-      setText(content.items.map(item => item.str).join(' '));
+      const rawText = content.items.map(item => item.str).join(' ');
+
+      // Normalize the text
+      const normalizedText = normalizeText(rawText);
+
+      setText(normalizedText);
     };
 
     loadPdf();
   }, [myFile, pageNumber]);
 
   const speakText = () => {
-    const words = text.split(/\s+/);
-    let i = pausedAtWordIndex !== null ? pausedAtWordIndex : 0;
+    const sentences = getTextSentences(text);
+    let i = pausedAtSentenceIndex!== null? pausedAtSentenceIndex : 0;
 
-    const speakWord = () => {
-      if (i < words.length) {
-        setSpeakingWordIndex(i);
-        const utterance = new SpeechSynthesisUtterance(words[i]);
-        utterance.rate = 1.5``; // Increase the speed of the speech
+    const speakSentence = () => {
+      if (i < sentences.length) {
+        setSpeakingSentenceIndex(i);
+        const utterance = new SpeechSynthesisUtterance(sentences[i]);
+        utterance.rate = 1; 
+        utterance.pitch = 1; 
+        utterance.volume = 1; 
+        const voices = window.speechSynthesis.getVoices();
+        utterance.voice = voices[7];
+
         utterance.onend = () => {
           i++;
-          speakWord();
+          speakSentence();
         };
         window.speechSynthesis.speak(utterance);
       }
     };
 
-    speakWord();
+    speakSentence();
   };
 
   const stopSpeech = () => {
-    setPausedAtWordIndex(speakingWordIndex);
+    setPausedAtSentenceIndex(speakingSentenceIndex);
     window.speechSynthesis.cancel();
   };
 
@@ -55,11 +65,11 @@ const MyPdfViewer = ({ myFile }) => {
     setNumPages(numPages);
   };
 
-  const goToPrevPage = () => setPageNumber(pageNumber - 1 <= 1 ? 1 : pageNumber - 1);
-  const goToNextPage = () => setPageNumber(pageNumber + 1 >= numPages ? numPages : pageNumber + 1);
+  const goToPrevPage = () => setPageNumber(pageNumber - 1 <= 1? 1 : pageNumber - 1);
+  const goToNextPage = () => setPageNumber(pageNumber + 1 >= numPages? numPages : pageNumber + 1);
 
   return (
-    <div style={{height:'100%'}} className="pdf-viewer-container">
+    <div style={{ height: '100%' }} className="pdf-viewer-container">
       <nav className="pdf-viewer-nav">
         <button onClick={goToPrevPage}>Prev</button>
         <button onClick={goToNextPage}>Next</button>
@@ -80,10 +90,23 @@ const MyPdfViewer = ({ myFile }) => {
         </Document>
 
         {/* Render the extracted text */}
-        
       </div>
     </div>
   );
 };
+
+function getTextSentences(text) {
+  return text.split('.').filter(sentence => sentence.trim()!== '');
+}
+
+function normalizeText(text) {
+
+  const normalizedText = text.replace(/\s+/g, ' ');
+
+
+  const correctedText = normalizedText.replace(/(\w)(\s+)/g, '$1$2');
+
+  return correctedText;
+}
 
 export default MyPdfViewer;

@@ -1,11 +1,18 @@
 import React from "react";
 import { Box } from "@mui/material";
 import StoT from "../components/StoT";
-import java from '../java.pdf'
-import PdfViewer from '../components/PdfViewer'
+import java from "../java.pdf";
+import PdfViewer from "../components/PdfViewer";
+import ReadFile from "../components/ReadFile";
 const StartClass = () => {
   return (
-    <Box border={"1px solid red"} display={"flex"} gap={"10px"}>
+    <Box
+      border={"1px solid red"}
+      display={"flex"}
+      gap={"10px"}
+      height={"100vh"}
+      overflow={"hidden"}
+    >
       <Box
         sx={{
           backgroundColor: "black",
@@ -13,23 +20,19 @@ const StartClass = () => {
           width: "70%",
         }}
       >
-        <PdfViewer myFile={java}/>
+        <PdfViewer myFile={java} />
       </Box>
       <Box display={"flex"} flexDirection={"column"} width={"30%"} gap={"10px"}>
         <Box
           sx={{
             backgroundColor: "black",
-            height: "49vh",
+            height: "auto",
           }}
         >
+          <ReadFile />
+        </Box>
 
-        </Box>
-        <Box
-        height={"49vh"}
-          
-        >
-          <StoT/>
-        </Box>
+        <StoT />
       </Box>
     </Box>
   );

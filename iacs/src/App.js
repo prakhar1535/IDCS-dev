@@ -7,10 +7,7 @@ import StartClass from "./pages/StartClass";
 function App() {
   return (
     <>
-      <Navbar />
-      <ReadFile />
       <StartClass />
-      
     </>
   );
 }

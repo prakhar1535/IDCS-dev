@@ -58,15 +58,13 @@ const StoT = () => {
           backgroundColor: "#F9F9F9",
           borderRadius: "20px",
           padding: "10px",
-          height: "100%",
-          
+          height: "auto",
         }}
       >
         {messages.map((message, index) => (
           <Box
             key={index}
             sx={{
-              
               backgroundColor: "white",
               padding: "10px",
               borderRadius: "20px",

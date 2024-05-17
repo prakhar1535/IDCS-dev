@@ -16,19 +16,35 @@ prev_x, prev_y = 0, 0
 dragging = False
 gesture_start_time = None
 fist_closed = False
+maximize = False
+minimize = False
+was_maximized = False
 
 def get_finger_tips(landmarks):
     finger_tips = [
+        landmarks[mp_hands.HandLandmark.THUMB_TIP],
         landmarks[mp_hands.HandLandmark.INDEX_FINGER_TIP],
         landmarks[mp_hands.HandLandmark.MIDDLE_FINGER_TIP],
         landmarks[mp_hands.HandLandmark.RING_FINGER_TIP],
-        landmarks[mp_hands.HandLandmark.PINKY_TIP],
-        landmarks[mp_hands.HandLandmark.THUMB_TIP]
+        landmarks[mp_hands.HandLandmark.PINKY_TIP]
     ]
     return finger_tips
 
+def get_finger_dips(landmarks):
+    finger_dips = [
+        landmarks[mp_hands.HandLandmark.THUMB_IP],
+        landmarks[mp_hands.HandLandmark.INDEX_FINGER_DIP],
+        landmarks[mp_hands.HandLandmark.MIDDLE_FINGER_DIP],
+        landmarks[mp_hands.HandLandmark.RING_FINGER_DIP],
+        landmarks[mp_hands.HandLandmark.PINKY_DIP]
+    ]
+    return finger_dips
+
 def get_distance(point1, point2):
     return ((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2) ** 0.5
+
+def are_fingers_up(tips, dips):
+    return [tips[i].y < dips[i].y for i in range(len(tips))]
 
 while True:
     success, img = cap.read()
@@ -43,9 +59,13 @@ while True:
             mp_draw.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
             finger_tips = get_finger_tips(hand_landmarks.landmark)
-            tip_distances = [get_distance(finger_tips[i], finger_tips[i - 1]) for i in range(1, len(finger_tips))]
+            finger_dips = get_finger_dips(hand_landmarks.landmark)
 
-            index_tip, thumb_tip = finger_tips[0], finger_tips[4]
+            # Determine which fingers are up
+            fingers_up = are_fingers_up(finger_tips, finger_dips)
+            thumb_up, index_up, middle_up, ring_up, pinky_up = fingers_up
+
+            index_tip, thumb_tip = finger_tips[1], finger_tips[0]
             index_finger_x, index_finger_y = int(index_tip.x * img.shape[1]), int(index_tip.y * img.shape[0])
             thumb_x, thumb_y = int(thumb_tip.x * img.shape[1]), int(thumb_tip.y * img.shape[0])
             
@@ -87,14 +107,28 @@ while True:
                 prev_x, prev_y = index_finger_x, index_finger_y
 
             # Fist detection
-            is_fist_closed = all(d < 0.1 for d in tip_distances)
+            is_fist_closed = not any(fingers_up)
 
             if is_fist_closed and not fist_closed:
-                print("PDF closed")
+                print("Fist closed")
                 fist_closed = True
             elif not is_fist_closed and fist_closed:
-                print("PDF opened")
+                print("Fist opened")
                 fist_closed = False
+
+            # Maximize/Minimize detection
+            if thumb_up and index_up and middle_up and not ring_up and not pinky_up:
+                if not maximize:
+                    print("Maximize")
+                    maximize = True
+                    minimize = False
+                    was_maximized = True
+            elif not thumb_up and not index_up and not middle_up and not ring_up and not pinky_up and was_maximized:
+                if not minimize:
+                    print("Minimize")
+                    minimize = True
+                    maximize = False
+                    was_maximized = False
 
     cv2.imshow("Gesture Controlled Virtual Mouse", img)
     if cv2.waitKey(1) & 0xFF == 27:
@@ -102,4 +136,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
- 

@@ -2,40 +2,6 @@ import cv2
 import mediapipe as mp
 import time
 import pyautogui
-import os
-import datetime
-
-# Function to take a screenshot
-def take_screenshot(filename_prefix="screenshot"):
-    """
-    Takes a screenshot of the entire screen.
-
-    Args:
-        filename_prefix (str, optional): The prefix for the screenshot filename. Defaults to "screenshot".
-
-    Returns:
-        str: The full path of the saved screenshot file.
-    """
-    # Capture the screenshot of the entire screen
-    image = pyautogui.screenshot()
-
-    # Get current date and time for unique filenames
-    now = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-    # Create a unique filename to avoid overwriting
-    filename = f"{filename_prefix}_{now}.png"
-
-    # Ensure the screenshots directory exists
-    screenshots_dir = os.path.join(os.getcwd(), "screenshots")
-    if not os.path.exists(screenshots_dir):
-        os.makedirs(screenshots_dir)
-
-    # Save the screenshot
-    filepath = os.path.join(screenshots_dir, filename)
-    image.save(filepath)
-
-    print(f"Screenshot saved: {filepath}")
-    return filepath
 
 # Initialize Mediapipe Hands
 mp_hands = mp.solutions.hands
@@ -136,7 +102,7 @@ while True:
             if thumb_up and index_up and not middle_up and not ring_up and pinky_up:
                 if not screenshot_taken:
                     print("Taking screenshot")
-                    take_screenshot()
+                    pyautogui.screenshot().save("screenshot.png")
                     screenshot_taken = True
             else:
                 screenshot_taken = False

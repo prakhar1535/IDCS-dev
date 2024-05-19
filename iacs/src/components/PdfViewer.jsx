@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "./PdfViewer.css";
+import { io } from 'socket.io-client';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -10,6 +11,7 @@ const MyPdfViewer = ({ myFile }) => {
   const [text, setText] = useState("");
   const [speakingSentenceIndex, setSpeakingSentenceIndex] = useState(null);
   const [pausedAtSentenceIndex, setPausedAtSentenceIndex] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -29,6 +31,39 @@ const MyPdfViewer = ({ myFile }) => {
 
     loadPdf();
   }, [myFile, pageNumber]);
+  useEffect(() => {
+    const socketIo = io.connect("ws://127.0.0.1:5000");
+
+    setSocket(socketIo);
+console.log(socketIo,'socketio');
+
+
+if (socket) {
+  socket.on('connect', () => {
+    console.log('Connected to server');
+  });
+
+  socketIo.on('next', (data) => {
+    alert('Next event received', data);
+    // Add your logic for handling the 'next' event here
+});
+
+socketIo.on('previous', (data) => {
+    alert('Previous event received', data);
+    // Add your logic for handling the 'previous' event here
+});
+
+  socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+  });
+}
+
+
+    return () => {
+      socketIo.disconnect();
+    };
+  }, []);
+
 
   const speakText = () => {
     const sentences = getTextSentences(text);

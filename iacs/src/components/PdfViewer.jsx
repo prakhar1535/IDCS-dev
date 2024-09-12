@@ -12,6 +12,7 @@ const MyPdfViewer = ({ myFile }) => {
   const [translatedText, setTranslatedText] = useState("");
   const [speakingSentenceIndex, setSpeakingSentenceIndex] = useState(null);
   const [pausedAtSentenceIndex, setPausedAtSentenceIndex] = useState(null);
+  const [language, setLanguage] = useState("en"); // State for language selection
 
   useEffect(() => {
     const loadPdf = async () => {
@@ -28,16 +29,20 @@ const MyPdfViewer = ({ myFile }) => {
 
       setText(normalizedText);
 
-      // Translate the extracted text to Gujarati
-      const gujaratiTranslation = await translateToGujarati(normalizedText);
-      setTranslatedText(gujaratiTranslation);
+      if (language === "gu") {
+        // Translate the extracted text to Gujarati
+        const gujaratiTranslation = await translateToGujarati(normalizedText);
+        setTranslatedText(gujaratiTranslation);
+      } else {
+        setTranslatedText(normalizedText); // Set the text directly for English
+      }
     };
 
     loadPdf();
-  }, [myFile, pageNumber]);
+  }, [myFile, pageNumber, language]);
 
   const speakText = () => {
-    const sentences = getTextSentences(translatedText); // Use translated text
+    const sentences = getTextSentences(translatedText); // Use translated or original text
     let i = pausedAtSentenceIndex !== null ? pausedAtSentenceIndex : 0;
 
     const speakSentence = () => {
@@ -47,8 +52,16 @@ const MyPdfViewer = ({ myFile }) => {
         utterance.rate = 1;
         utterance.pitch = 1;
         utterance.volume = 1;
+
         const voices = window.speechSynthesis.getVoices();
-        utterance.voice = voices[7];
+        const languageCode = language === "gu" ? "gu-IN" : "en-US"; // Set language code
+        const selectedVoice = voices.find(voice => voice.lang === languageCode);
+
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        } else {
+          console.warn(`Voice for ${languageCode} not available, using default voice.`);
+        }
 
         utterance.onend = () => {
           i++;
@@ -82,6 +95,11 @@ const MyPdfViewer = ({ myFile }) => {
         <button onClick={goToNextPage}>Next</button>
         <button onClick={speakText}>Speak</button>
         <button onClick={stopSpeech}>Stop</button>
+
+        <select onChange={(e) => setLanguage(e.target.value)} value={language}>
+          <option value="en">English</option>
+          <option value="gu">Gujarati</option>
+        </select>
 
         <p>
           Page {pageNumber} of {numPages}

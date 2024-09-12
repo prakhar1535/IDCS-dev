@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import axios from "axios";
 import "./PdfViewer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
@@ -8,6 +9,7 @@ const MyPdfViewer = ({ myFile }) => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [text, setText] = useState("");
+  const [translatedText, setTranslatedText] = useState("");
   const [speakingSentenceIndex, setSpeakingSentenceIndex] = useState(null);
   const [pausedAtSentenceIndex, setPausedAtSentenceIndex] = useState(null);
 
@@ -25,13 +27,17 @@ const MyPdfViewer = ({ myFile }) => {
       const normalizedText = normalizeText(rawText);
 
       setText(normalizedText);
+
+      // Translate the extracted text to Gujarati
+      const gujaratiTranslation = await translateToGujarati(normalizedText);
+      setTranslatedText(gujaratiTranslation);
     };
 
     loadPdf();
   }, [myFile, pageNumber]);
 
   const speakText = () => {
-    const sentences = getTextSentences(text);
+    const sentences = getTextSentences(translatedText); // Use translated text
     let i = pausedAtSentenceIndex !== null ? pausedAtSentenceIndex : 0;
 
     const speakSentence = () => {
@@ -88,9 +94,46 @@ const MyPdfViewer = ({ myFile }) => {
         </Document>
 
         {/* Render the extracted text */}
+        <div>
+          <h3>Translated Text:</h3>
+          <p>{translatedText}</p>
+        </div>
       </div>
     </div>
   );
+};
+
+// Translation function using Microsoft Translator API
+const translateToGujarati = async (text) => {
+  const options = {
+    method: 'POST',
+    url: 'https://microsoft-translator-text.p.rapidapi.com/translate',
+    params: {
+      'api-version': '3.0',
+      to: 'gu', // Gujarati language code
+      profanityAction: 'NoAction',
+      textType: 'plain'
+    },
+    headers: {
+      'x-rapidapi-key': '4aba494ffdmshd92178fbf7bd38ap1d2bdcjsna84394b46eab',
+      'x-rapidapi-host': 'microsoft-translator-text.p.rapidapi.com',
+      'Content-Type': 'application/json'
+    },
+    data: [
+      {
+        Text: text
+      }
+    ]
+  };
+
+  try {
+    const response = await axios.request(options);
+    const translatedText = response.data[0].translations[0].text;
+    return translatedText;
+  } catch (error) {
+    console.error(error);
+    return text; // Return original text if translation fails
+  }
 };
 
 function getTextSentences(text) {
@@ -99,9 +142,7 @@ function getTextSentences(text) {
 
 function normalizeText(text) {
   const normalizedText = text.replace(/\s+/g, " ");
-
   const correctedText = normalizedText.replace(/(\w)(\s+)/g, "$1$2");
-
   return correctedText;
 }
 

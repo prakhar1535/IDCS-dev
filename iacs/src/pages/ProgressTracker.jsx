@@ -1,16 +1,117 @@
-"use client"
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemIcon, 
+  ListItemText, 
+  CssBaseline,
+  Box,
+  Container,
+  Grid,
+  Paper,
+  Avatar,
+  InputBase,
+  IconButton,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  LinearProgress
+} from '@mui/material';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  Home as HomeIcon,
+  BarChart as BarChartIcon,
+  People as PeopleIcon,
+  Book as BookIcon,
+  Settings as SettingsIcon,
+  Laptop as LaptopIcon,
+  TrendingUp as TrendingUpIcon,
+  Notifications as NotificationsIcon,
+  Search as SearchIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon
+} from '@mui/icons-material';
+import { 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  BarElement, 
+  PointElement, 
+  LineElement, 
+  RadialLinearScale, 
+  ArcElement, 
+  Title, 
+  Tooltip, 
+  Legend, 
+  Filler 
+} from 'chart.js';
 import { Bar, Line, Radar, Doughnut } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, RadialLinearScale, ArcElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-import { Laptop, Users, TrendingUp, BookOpen, Home, BarChart2, UserCheck, Settings, Bell, Search, ChevronDown, LogOut, User } from 'lucide-react';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, RadialLinearScale, ArcElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(
+  CategoryScale, 
+  LinearScale, 
+  BarElement, 
+  PointElement, 
+  LineElement, 
+  RadialLinearScale, 
+  ArcElement, 
+  Title, 
+  Tooltip, 
+  Legend, 
+  Filler
+);
 
-// Enhanced sample data
+// Theme setup
+const theme = createTheme();
+
+// Styled components
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.common.white,
+  '&:hover': {
+    backgroundColor: theme.palette.common.white,
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(3),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}));
+
+// Sample data (you would typically fetch this from an API)
 const progressData = [
   { week: 'Week 1', average: 20, topPerformer: 35 },
   { week: 'Week 2', average: 35, topPerformer: 50 },
@@ -55,16 +156,6 @@ const accessibilityData = {
 const Dashboard = () => {
   const [activeSection, setActiveSection] = useState('home');
 
-  const NavItem = ({ icon: Icon, label, section }) => (
-    <li 
-      className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${activeSection === section ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100'}`}
-      onClick={() => setActiveSection(section)}
-    >
-      <Icon size={20} />
-      <span>{label}</span>
-    </li>
-  );
-
   const renderContent = () => {
     switch(activeSection) {
       case 'home':
@@ -79,73 +170,99 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-md">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800">EduAdapt</h1>
-          <p className="text-sm text-gray-500">Inclusive Learning Platform</p>
-        </div>
-        <nav className="mt-8">
-          <ul className="space-y-2 px-4">
-            <NavItem icon={Home} label="Dashboard" section="home" />
-            <NavItem icon={BarChart2} label="Analytics" section="analytics" />
-            <NavItem icon={UserCheck} label="Students" section="students" />
-            <NavItem icon={BookOpen} label="Courses" section="courses" />
-            <NavItem icon={Settings} label="Settings" section="settings" />
-          </ul>
-        </nav>
-      </aside>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm z-10">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                {activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}
-              </h2>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <input type="text" placeholder="Search..." className="bg-gray-100 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                <Search className="absolute right-3 top-2.5 text-gray-400" size={18} />
-              </div>
-              <Bell className="text-gray-400 cursor-pointer" />
-              <div className="flex items-center space-x-2 cursor-pointer">
-                <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                <span className="text-sm font-medium text-gray-700">John Doe</span>
-                <ChevronDown size={16} className="text-gray-400" />
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto p-8 bg-gray-100">
+    <ThemeProvider theme={theme}>
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              EduAdapt
+            </Typography>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </Search>
+            <IconButton color="inherit">
+              <NotificationsIcon />
+            </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+              <Avatar alt="John Doe" src="/static/images/avatar/1.jpg" />
+              <Typography variant="subtitle1" sx={{ ml: 1 }}>John Doe</Typography>
+              <IconButton color="inherit" size="small">
+                <LaptopIcon />
+              </IconButton>
+            </Box>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: 240,
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
+          }}
+        >
+          <Toolbar />
+          <Box sx={{ overflow: 'auto' }}>
+            <List>
+              {[
+                { text: 'Dashboard', icon: <HomeIcon />, section: 'home' },
+                { text: 'Analytics', icon: <BarChartIcon />, section: 'analytics' },
+                { text: 'Students', icon: <PeopleIcon />, section: 'students' },
+                { text: 'Courses', icon: <BookIcon />, section: 'courses' },
+                { text: 'Settings', icon: <SettingsIcon />, section: 'settings' },
+              ].map((item) => (
+                <ListItem 
+                  button 
+                  key={item.text} 
+                  onClick={() => setActiveSection(item.section)}
+                  selected={activeSection === item.section}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+        </Drawer>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Toolbar />
           {renderContent()}
-        </main>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 
 const HomeSection = () => (
-  <div>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <StatCard icon={Users} label="Total Students" value="1,234" change="+5.2%" />
-      <StatCard icon={Laptop} label="Active Courses" value="28" change="+3" />
-      <StatCard icon={TrendingUp} label="Avg. Improvement" value="12.7%" change="+2.3%" />
-      <StatCard icon={BookOpen} label="Learning Modules" value="156" change="+5" />
-    </div>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <Card className="col-span-2">
-        <CardHeader>
-          <CardTitle>Learning Path Progress</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-80">
+  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Grid container spacing={3}>
+      {/* Stat Cards */}
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard icon={<PeopleIcon />} label="Total Students" value="1,234" change="+5.2%" />
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard icon={<LaptopIcon />} label="Active Courses" value="28" change="+3" />
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard icon={<TrendingUpIcon />} label="Avg. Improvement" value="12.7%" change="+2.3%" />
+      </Grid>
+      <Grid item xs={12} sm={6} md={3}>
+        <StatCard icon={<BookIcon />} label="Learning Modules" value="156" change="+5" />
+      </Grid>
+      
+      {/* Charts */}
+      <Grid item xs={12}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Learning Path Progress
+          </Typography>
+          <Box sx={{ height: 300 }}>
             <Line
               data={{
                 labels: progressData.map(d => d.week),
@@ -177,163 +294,236 @@ const HomeSection = () => (
                 },
               }}
             />
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Subject Performance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Bar
-            data={subjectData}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Average Scores by Subject' },
-              },
-              scales: {
-                y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score' } },
-              },
-            }}
-          />
-        </CardContent>
-      </Card>
-      <AccessibilityDistribution />
-    </div>
-    <RecentActivityFeed />
-  </div>
+          </Box>
+        </Paper>
+      </Grid>
+      
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Subject Performance
+          </Typography>
+          <Box sx={{ height: 300 }}>
+            <Bar
+              data={subjectData}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: true, text: 'Average Scores by Subject' },
+                },
+                scales: {
+                  y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score' } },
+                },
+              }}
+            />
+          </Box>
+        </Paper>
+      </Grid>
+      
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Accessibility Needs Distribution
+          </Typography>
+          <Box sx={{ height: 300 }}>
+            <Doughnut
+              data={accessibilityData}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { position: 'right' },
+                  title: { display: true, text: 'Distribution of Accessibility Needs' },
+                },
+              }}
+            />
+          </Box>
+        </Paper>
+      </Grid>
+      
+      {/* Recent Activity Feed */}
+      <Grid item xs={12}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Recent Activity
+          </Typography>
+          <List>
+            <ListItem>
+              <ListItemIcon>
+                <CheckCircleOutlineIcon color="success" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Aarav Patel completed 'Advanced Sign Language Communication' module"
+                secondary="2 hours ago"
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <TrendingUpIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Overall student performance increased by 3.2% this week"
+                secondary="1 day ago"
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemIcon>
+                <BookIcon color="secondary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="New course 'Inclusive STEM Education' added to the curriculum"
+                secondary="3 days ago"
+              />
+            </ListItem>
+          </List>
+        </Paper>
+      </Grid>
+    </Grid>
+  </Container>
 );
 
 const AnalyticsSection = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Detailed Analytics</h2>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Subject Performance Breakdown</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Bar
-            data={subjectData}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Average vs Top Scores by Subject' },
-              },
-              scales: {
-                y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score' } },
-              },
-            }}
-          />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Skill Assessment Radar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Radar
-            data={{
-              labels: ['Reading', 'Writing', 'Listening', 'Speaking', 'Problem Solving', 'Critical Thinking'],
-              datasets: [{
-                label: 'Average Skill Level',
-                data: [65, 59, 80, 81, 56, 55],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                pointBackgroundColor: 'rgb(54, 162, 235)',
-              }]
-            }}
-            options={{
-              responsive: true,
-              plugins: {
-                legend: { position: 'top' },
-                title: { display: true, text: 'Student Skill Assessment' },
-              },
-              scales: {
-                r: { beginAtZero: true, max: 100 },
-              },
-            }}
-          />
-        </CardContent>
-      </Card>
-    </div>
-    <Card>
-      <CardHeader>
-        <CardTitle>Detailed Performance Metrics</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Metric</TableHead>
-              <TableHead>This Month</TableHead>
-              <TableHead>Last Month</TableHead>
-              <TableHead>Change</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell>Average Completion Rate</TableCell>
-              <TableCell>78%</TableCell>
-              <TableCell>72%</TableCell>
-              <TableCell className="text-green-600">+6%</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Average Time per Module</TableCell>
-              <TableCell>45 minutes</TableCell>
-              <TableCell>52 minutes</TableCell>
-              <TableCell className="text-green-600">-7 minutes</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Student Engagement Score</TableCell>
-              <TableCell>8.5/10</TableCell>
-              <TableCell>7.8/10</TableCell>
-              <TableCell className="text-green-600">+0.7</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Accessibility Feature Usage</TableCell>
-              <TableCell>92%</TableCell>
-              <TableCell>85%</TableCell>
-              <TableCell className="text-green-600">+7%</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  </div>
+  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Typography variant="h4" gutterBottom>
+      Detailed Analytics
+    </Typography>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Subject Performance Breakdown
+          </Typography>
+          <Box sx={{ height: 300 }}>
+            <Bar
+              data={subjectData}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: true, text: 'Average vs Top Scores by Subject' },
+                },
+                scales: {
+                  y: { beginAtZero: true, max: 100, title: { display: true, text: 'Score' } },
+                },
+              }}
+            />
+          </Box>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Skill Assessment Radar
+          </Typography>
+          <Box sx={{ height: 300 }}>
+            <Radar
+              data={{
+                labels: ['Reading', 'Writing', 'Listening', 'Speaking', 'Problem Solving', 'Critical Thinking'],
+                datasets: [{
+                  label: 'Average Skill Level',
+                  data: [65, 59, 80, 81, 56, 55],
+                  backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                  borderColor: 'rgb(54, 162, 235)',
+                  pointBackgroundColor: 'rgb(54, 162, 235)',
+                }]
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { position: 'top' },
+                  title: { display: true, text: 'Student Skill Assessment' },
+                },
+                scales: {
+                  r: { beginAtZero: true, max: 100 },
+                },
+              }}
+            />
+          </Box>
+        </Paper>
+      </Grid>
+      <Grid item xs={12}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Detailed Performance Metrics
+          </Typography>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Metric</TableCell>
+                  <TableCell>This Month</TableCell>
+                  <TableCell>Last Month</TableCell>
+                  <TableCell>Change</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>Average Completion Rate</TableCell>
+                  <TableCell>78%</TableCell>
+                  <TableCell>72%</TableCell>
+                  <TableCell sx={{ color: 'success.main' }}>+6%</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Average Time per Module</TableCell>
+                  <TableCell>45 minutes</TableCell>
+                  <TableCell>52 minutes</TableCell>
+                  <TableCell sx={{ color: 'success.main' }}>-7 minutes</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Student Engagement Score</TableCell>
+                  <TableCell>8.5/10</TableCell>
+                  <TableCell>7.8/10</TableCell>
+                  <TableCell sx={{ color: 'success.main' }}>+0.7</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell>Accessibility Feature Usage</TableCell>
+                  <TableCell>92%</TableCell>
+                  <TableCell>85%</TableCell>
+                  <TableCell sx={{ color: 'success.main' }}>+7%</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Grid>
+    </Grid>
+  </Container>
 );
 
 const StudentsSection = () => (
-  <div>
-    <h2 className="text-3xl font-bold mb-6">Student Profiles</h2>
-    <Card>
-      <CardContent>
+  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Typography variant="h4" gutterBottom>
+      Student Profiles
+    </Typography>
+    <Paper sx={{ p: 2, mb: 4 }}>
+      <TableContainer>
         <Table>
-          <TableHeader>
+          <TableHead>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Overall Progress</TableHead>
-              <TableHead>Improvement</TableHead>
-              <TableHead>Sign Language</TableHead>
-              <TableHead>Braille</TableHead>
-              <TableHead>Completed Modules</TableHead>
-              <TableHead>Last Active</TableHead>
+              <TableCell>Name</TableCell>
+              <TableCell>Overall Progress</TableCell>
+              <TableCell>Improvement</TableCell>
+              <TableCell>Sign Language</TableCell>
+              <TableCell>Braille</TableCell>
+              <TableCell>Completed Modules</TableCell>
+              <TableCell>Last Active</TableCell>
             </TableRow>
-          </TableHeader>
+          </TableHead>
           <TableBody>
             {studentData.map((student) => (
               <TableRow key={student.id}>
-                <TableCell className="font-medium">{student.name}</TableCell>
+                <TableCell>{student.name}</TableCell>
                 <TableCell>
-                  <div className="flex items-center">
-                    <Progress value={student.overallScore} className="w-full mr-2" />
-                    <span>{student.overallScore}%</span>
-                  </div>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ width: '100%', mr: 1 }}>
+                      <LinearProgress variant="determinate" value={student.overallScore} />
+                    </Box>
+                    <Box sx={{ minWidth: 35 }}>
+                      <Typography variant="body2" color="text.secondary">{`${student.overallScore}%`}</Typography>
+                    </Box>
+                  </Box>
                 </TableCell>
-                <TableCell className="text-green-600">+{student.improvement}%</TableCell>
+                <TableCell sx={{ color: 'success.main' }}>+{student.improvement}%</TableCell>
                 <TableCell>{student.signLanguage}%</TableCell>
                 <TableCell>{student.braille}%</TableCell>
                 <TableCell>{student.completedModules}</TableCell>
@@ -342,133 +532,74 @@ const StudentsSection = () => (
             ))}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
-    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Top Performers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-4">
+      </TableContainer>
+    </Paper>
+    <Grid container spacing={3}>
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Top Performers
+          </Typography>
+          <List>
             {studentData.sort((a, b) => b.overallScore - a.overallScore).slice(0, 3).map((student, index) => (
-              <li key={student.id} className="flex items-center space-x-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{student.name}</p>
-                  <p className="text-sm text-gray-500">Overall Score: {student.overallScore}%</p>
-                </div>
-              </li>
+              <ListItem key={student.id}>
+                <ListItemIcon>
+                  <Avatar sx={{ bgcolor: 'primary.main' }}>{index + 1}</Avatar>
+                </ListItemIcon>
+                <ListItemText
+                  primary={student.name}
+                  secondary={`Overall Score: ${student.overallScore}%`}
+                />
+              </ListItem>
             ))}
-          </ul>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Most Improved</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-4">
+          </List>
+        </Paper>
+      </Grid>
+      <Grid item xs={12} md={6}>
+        <Paper sx={{ p: 2 }}>
+          <Typography component="h2" variant="h6" color="primary" gutterBottom>
+            Most Improved
+          </Typography>
+          <List>
             {studentData.sort((a, b) => b.improvement - a.improvement).slice(0, 3).map((student, index) => (
-              <li key={student.id} className="flex items-center space-x-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-bold">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{student.name}</p>
-                  <p className="text-sm text-gray-500">Improvement: +{student.improvement}%</p>
-                </div>
-              </li>
+              <ListItem key={student.id}>
+                <ListItemIcon>
+                  <Avatar sx={{ bgcolor: 'success.main' }}>{index + 1}</Avatar>
+                </ListItemIcon>
+                <ListItemText
+                  primary={student.name}
+                  secondary={`Improvement: +${student.improvement}%`}
+                />
+              </ListItem>
             ))}
-          </ul>
-        </CardContent>
-      </Card>
-    </div>
-  </div>
+          </List>
+        </Paper>
+      </Grid>
+    </Grid>
+  </Container>
 );
 
-const StatCard = ({ icon: Icon, label, value, change }) => (
-  <Card>
-    <CardContent className="flex items-center p-6">
-      <Icon size={24} className="text-blue-500 mr-4" />
-      <div>
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className={`text-sm ${change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>
-          {change}
-        </p>
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const AccessibilityDistribution = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Accessibility Needs Distribution</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="h-64">
-        <Doughnut
-          data={accessibilityData}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: { position: 'right' },
-              title: { display: true, text: 'Distribution of Accessibility Needs' },
-            },
-          }}
-        />
-      </div>
-    </CardContent>
-  </Card>
-);
-
-const RecentActivityFeed = () => (
-  <Card>
-    <CardHeader>
-      <CardTitle>Recent Activity</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <ul className="space-y-4">
-        <li className="flex items-center space-x-3">
-          <div className="flex-shrink-0">
-            <UserCheck size={20} className="text-green-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              Aarav Patel completed "Advanced Sign Language Communication" module
-            </p>
-            <p className="text-sm text-gray-500">2 hours ago</p>
-          </div>
-        </li>
-        <li className="flex items-center space-x-3">
-          <div className="flex-shrink-0">
-            <TrendingUp size={20} className="text-blue-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              Overall student performance increased by 3.2% this week
-            </p>
-            <p className="text-sm text-gray-500">1 day ago</p>
-          </div>
-        </li>
-        <li className="flex items-center space-x-3">
-          <div className="flex-shrink-0">
-            <BookOpen size={20} className="text-purple-500" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              New course "Inclusive STEM Education" added to the curriculum
-            </p>
-            <p className="text-sm text-gray-500">3 days ago</p>
-          </div>
-        </li>
-      </ul>
-    </CardContent>
-  </Card>
+const StatCard = ({ icon, label, value, change }) => (
+  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: 140 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+      {React.cloneElement(icon, { color: 'primary', sx: { mr: 1 } })}
+      <Typography color="text.secondary" variant="body2">
+        {label}
+      </Typography>
+    </Box>
+    <Typography component="p" variant="h4">
+      {value}
+    </Typography>
+    <Typography 
+      sx={{ 
+        color: change.startsWith('+') ? 'success.main' : 'error.main',
+        mt: 'auto'
+      }} 
+      variant="body2"
+    >
+      {change}
+    </Typography>
+  </Paper>
 );
 
 export default Dashboard;

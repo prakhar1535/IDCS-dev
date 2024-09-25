@@ -1,93 +1,134 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Mic, FileText, BarChart2, Brain, Hand, Users } from 'lucide-react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  Card, 
+  CardContent, 
+  Container, 
+  Grid, 
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Hidden,
+  useMediaQuery
+} from '@mui/material';
+import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+
+// Create a theme instance
+const theme = createTheme();
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  textTransform: 'none',
+  borderRadius: theme.shape.borderRadius,
+}));
 
 const LandingPage = () => {
   return (
-    <div className="bg-white text-gray-900 min-h-screen">
-      <Header />
-      <main>
-        <HeroSection />
-        <FeaturesSection />
-        <HowItWorks />
-        <CallToAction />
-      </main>
-      <Footer />
-    </div>
+    <ThemeProvider theme={theme}>
+      <Box sx={{ bgcolor: 'background.default', color: 'text.primary', minHeight: '100vh' }}>
+        <Header />
+        <main>
+          <HeroSection />
+          <FeaturesSection />
+          <HowItWorks />
+          <CallToAction />
+        </main>
+        <Footer />
+      </Box>
+    </ThemeProvider>
   );
 };
 
-const Header = () => (
-  <header className="bg-white shadow-sm">
-    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-      <div className="flex justify-between items-center">
-        <div className="flex items-center">
-          <img src="/logo.svg" alt="EduAdapt Logo" className="h-8 w-auto" />
-          <span className="ml-2 text-xl font-bold text-gray-900">EduAdapt</span>
-        </div>
-        <div className="hidden md:flex space-x-8">
-          {['Features', 'How It Works', 'Testimonials', 'Contact'].map((item) => (
-            <a key={item} href={`#${item.toLowerCase().replace(' ', '-')}`} className="text-gray-600 hover:text-gray-900">
-              {item}
-            </a>
-          ))}
-        </div>
-        <div className="hidden md:flex items-center space-x-4">
-          <Button variant="outline">Log In</Button>
-          <Button>Sign Up</Button>
-        </div>
-      </div>
-    </nav>
-  </header>
-);
+const Header = () => {
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  return (
+    <AppBar position="static" color="default" elevation={1}>
+      <Container maxWidth="lg">
+        <Toolbar disableGutters>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+              EduAdapt
+            </Typography>
+          </Box>
+          <Hidden mdDown>
+            <Box sx={{ display: 'flex', gap: 4 }}>
+              {['Features', 'How It Works', 'Testimonials', 'Contact'].map((item) => (
+                <Button key={item} color="inherit" href={`#${item.toLowerCase().replace(' ', '-')}`}>
+                  {item}
+                </Button>
+              ))}
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, ml: 4 }}>
+              <StyledButton variant="outlined" color="primary">Log In</StyledButton>
+              <StyledButton variant="contained" color="primary">Sign Up</StyledButton>
+            </Box>
+          </Hidden>
+          {isMobile && (
+            <Button color="inherit">Menu</Button>
+          )}
+        </Toolbar>
+      </Container>
+    </AppBar>
+  );
+};
 
 const HeroSection = () => (
-  <section className="bg-gray-50 py-20">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 className="text-5xl font-bold mb-6">Inclusive Education Reimagined</h1>
-      <p className="text-xl mb-8 max-w-3xl mx-auto">
+  <Box sx={{ bgcolor: 'grey.100', py: 10, textAlign: 'center' }}>
+    <Container maxWidth="md">
+      <Typography variant="h2" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Inclusive Education Reimagined
+      </Typography>
+      <Typography variant="h5" paragraph sx={{ mb: 4, maxWidth: '800px', mx: 'auto' }}>
         Empowering deaf and mute students with AI-driven learning in Gujarati and Indian Sign Language
-      </p>
-      <Button size="lg" className="text-lg px-8 py-4">Start Your Journey</Button>
-    </div>
-  </section>
+      </Typography>
+      <StyledButton variant="contained" color="primary" size="large" sx={{ px: 4, py: 1.5 }}>
+        Start Your Journey
+      </StyledButton>
+    </Container>
+  </Box>
 );
 
 const FeaturesSection = () => {
   const features = [
-    { icon: <Hand />, title: "Sign Language Converter", description: "Real-time gesture recognition using advanced AI" },
-    { icon: <Mic />, title: "Speech to Gujarati", description: "Instant speech recognition and translation" },
-    { icon: <FileText />, title: "Interactive PDF Viewer", description: "Voice-controlled document navigation with AI narration" },
-    { icon: <BarChart2 />, title: "Progress Tracking", description: "Detailed analytics and personalized learning paths" },
-    { icon: <Brain />, title: "AI-Powered Learning", description: "Adaptive lessons tailored to individual needs" },
-    { icon: <CheckCircle2 />, title: "Comprehensive Modules", description: "Full curriculum support in multiple subjects" },
+    { title: "Sign Language Converter", description: "Real-time gesture recognition using advanced AI" },
+    { title: "Speech to Gujarati", description: "Instant speech recognition and translation" },
+    { title: "Interactive PDF Viewer", description: "Voice-controlled document navigation with AI narration" },
+    { title: "Progress Tracking", description: "Detailed analytics and personalized learning paths" },
+    { title: "AI-Powered Learning", description: "Adaptive lessons tailored to individual needs" },
+    { title: "Comprehensive Modules", description: "Full curriculum support in multiple subjects" },
   ];
 
   return (
-    <section id="features" className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">Cutting-Edge Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <Box id="features" sx={{ py: 10 }}>
+      <Container maxWidth="lg">
+        <Typography variant="h3" component="h2" align="center" gutterBottom sx={{ fontWeight: 'bold', mb: 6 }}>
+          Cutting-Edge Features
+        </Typography>
+        <Grid container spacing={4}>
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+            <Grid item xs={12} md={6} lg={4} key={index}>
+              <FeatureCard {...feature} />
+            </Grid>
           ))}
-        </div>
-      </div>
-    </section>
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
-const FeatureCard = ({ icon, title, description }) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center space-x-2">
-        <span className="text-gray-600">{icon}</span>
-        <span>{title}</span>
-      </CardTitle>
-    </CardHeader>
+const FeatureCard = ({ title, description }) => (
+  <Card raised sx={{ height: '100%' }}>
     <CardContent>
-      <p className="text-gray-600">{description}</p>
+      <Typography variant="h6" component="h3" gutterBottom>
+        {title}
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {description}
+      </Typography>
     </CardContent>
   </Card>
 );
@@ -101,73 +142,109 @@ const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="bg-gray-50 py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">How EduAdapt Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <Box id="how-it-works" sx={{ bgcolor: 'grey.100', py: 10 }}>
+      <Container maxWidth="lg">
+        <Typography variant="h3" component="h2" align="center" gutterBottom sx={{ fontWeight: 'bold', mb: 6 }}>
+          How EduAdapt Works
+        </Typography>
+        <Grid container spacing={4}>
           {steps.map((step, index) => (
-            <div key={index} className="text-center">
-              <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-gray-900">{index + 1}</span>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-              <p className="text-gray-600">{step.description}</p>
-            </div>
+            <Grid item xs={12} md={6} lg={3} key={index}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Box sx={{ 
+                  bgcolor: 'background.paper', 
+                  borderRadius: '50%', 
+                  width: 64, 
+                  height: 64, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  mx: 'auto', 
+                  mb: 2 
+                }}>
+                  <Typography variant="h4" component="span" sx={{ fontWeight: 'bold' }}>
+                    {index + 1}
+                  </Typography>
+                </Box>
+                <Typography variant="h6" component="h3" gutterBottom>
+                  {step.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {step.description}
+                </Typography>
+              </Box>
+            </Grid>
           ))}
-        </div>
-      </div>
-    </section>
+        </Grid>
+      </Container>
+    </Box>
   );
 };
 
-
 const CallToAction = () => (
-  <section className="bg-gray-900 text-white py-20 px-4">
-    <div className="max-w-7xl mx-auto text-center">
-      <h2 className="text-3xl font-bold mb-6">Ready to Transform Your Learning Experience?</h2>
-      <p className="text-xl mb-8">Join thousands of students, teachers, and parents in making education truly inclusive.</p>
-      <Button size="lg" className="text-lg px-8 py-4 bg-white text-gray-900 hover:bg-gray-100">
+  <Box sx={{ bgcolor: 'primary.main', color: 'primary.contrastText', py: 10, textAlign: 'center' }}>
+    <Container maxWidth="md">
+      <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+        Ready to Transform Your Learning Experience?
+      </Typography>
+      <Typography variant="h5" paragraph sx={{ mb: 4 }}>
+        Join thousands of students, teachers, and parents in making education truly inclusive.
+      </Typography>
+      <StyledButton 
+        variant="contained" 
+        color="secondary" 
+        size="large" 
+        sx={{ px: 4, py: 1.5, bgcolor: 'background.paper', color: 'text.primary', '&:hover': { bgcolor: 'grey.100' } }}
+      >
         Start Your Free Trial
-      </Button>
-    </div>
-  </section>
+      </StyledButton>
+    </Container>
+  </Box>
 );
 
 const Footer = () => (
-  <footer className="bg-gray-100 py-12 px-4">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div>
-        <h3 className="text-lg font-semibold mb-4">EduAdapt</h3>
-        <p className="text-gray-600">Empowering inclusive education through technology.</p>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Features</h3>
-        <ul className="space-y-2 text-gray-600">
-          <li>Sign Language Converter</li>
-          <li>Speech to Gujarati</li>
-          <li>Interactive PDF Viewer</li>
-          <li>Progress Tracking</li>
-        </ul>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Resources</h3>
-        <ul className="space-y-2 text-gray-600">
-          <li>Blog</li>
-          <li>Tutorials</li>
-          <li>FAQs</li>
-          <li>Support</li>
-        </ul>
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Contact</h3>
-        <p className="text-gray-600">info@eduadapt.com</p>
-        <p className="text-gray-600">+91 1234567890</p>
-      </div>
-    </div>
-    <div className="mt-8 pt-8 border-t border-gray-200 text-center text-gray-600">
-      <p>&copy; 2024 EduAdapt. All rights reserved.</p>
-    </div>
-  </footer>
+  <Box component="footer" sx={{ bgcolor: 'grey.100', py: 6 }}>
+    <Container maxWidth="lg">
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h6" gutterBottom>EduAdapt</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Empowering inclusive education through technology.
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h6" gutterBottom>Features</Typography>
+          <List dense>
+            {['Sign Language Converter', 'Speech to Gujarati', 'Interactive PDF Viewer', 'Progress Tracking'].map((item) => (
+              <ListItem key={item} disablePadding>
+                <ListItemText primary={item} />
+              </ListItem>
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h6" gutterBottom>Resources</Typography>
+          <List dense>
+            {['Blog', 'Tutorials', 'FAQs', 'Support'].map((item) => (
+              <ListItem key={item} disablePadding>
+                <ListItemText primary={item} />
+              </ListItem>
+            ))}
+          </List>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="h6" gutterBottom>Contact</Typography>
+          <Typography variant="body2" paragraph>info@eduadapt.com</Typography>
+          <Typography variant="body2">+91 1234567890</Typography>
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 4, pt: 4, borderTop: 1, borderColor: 'divider', textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          &copy; 2024 EduAdapt. All rights reserved.
+        </Typography>
+      </Box>
+    </Container>
+  </Box>
 );
 
 export default LandingPage;
